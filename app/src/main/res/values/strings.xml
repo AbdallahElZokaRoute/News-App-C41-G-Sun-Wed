@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">News App C41 G Sun Wed</string>
+    <string name="title_activity_splash">SplashActivity</string>
+    <string name="news_application_logo">News Application Logo</string>
+    <string name="application_development_signature">Application development Signature</string>
+    <string name="navigation_menu_icon">"Navigation Menu icon "</string>
+    <string name="news_search">News Search</string>
+    <string name="by">By:</string>
 </resources>

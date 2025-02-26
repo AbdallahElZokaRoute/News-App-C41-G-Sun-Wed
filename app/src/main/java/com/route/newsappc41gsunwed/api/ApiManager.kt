@@ -10,6 +10,8 @@ object ApiManager {
     val API_KEY = "8e30e66ecc364d75967401f639e6f535"
     private val httpLoggingInterceptor = HttpLoggingInterceptor { message ->
         Log.e("API", message)
+    }.apply {
+        level = HttpLoggingInterceptor.Level.BODY
     }
     private val okHttpClient = OkHttpClient.Builder()
         .addInterceptor(httpLoggingInterceptor)
