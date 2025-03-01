@@ -3,6 +3,7 @@ package com.route.newsappc41gsunwed.news
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,17 +14,21 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -37,67 +42,58 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.route.newsappc41gsunwed.R
-import com.route.newsappc41gsunwed.api.ApiManager
 import com.route.newsappc41gsunwed.api.model.ArticlesItem
-import com.route.newsappc41gsunwed.api.model.NewsResponse
 import com.route.newsappc41gsunwed.api.model.SourcesItem
-import com.route.newsappc41gsunwed.api.model.SourcesResponse
 import com.route.newsappc41gsunwed.ui.theme.gray
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import androidx.lifecycle.viewmodel.compose.viewModel
 
-
+// News Screen -> MVVM
 @Composable
-fun NewsScreenContent(endpointId: String, modifier: Modifier = Modifier) {
-    val selectedSourceId = remember {
-        mutableStateOf("")
-    }
-    val newsListStates = remember {
-        mutableStateListOf<ArticlesItem>()
-    }
-    val sourcesListStates = remember {
-        mutableStateListOf<SourcesItem>()
-    }
+fun NewsScreenContent(
+    endpointId: String, viewModel: NewsViewModel = viewModel(), modifier: Modifier = Modifier
+) {
+    val sourcesList = viewModel.sourcesListStates
+    val newsList = viewModel.newsListStates
     LaunchedEffect(Unit) {
-        getSources(endpointId = endpointId, onSuccess = {
-            sourcesListStates.addAll(it)
-        }, onFailure = {
-            Log.e("TAG", "NewsScreenContent: $it")
-        })
+        viewModel.getSources(endpointId)
     }
-    LaunchedEffect(selectedSourceId.value) {
-        if (selectedSourceId.value.isNotEmpty())
-            ApiManager.newsServices.getNewsBySource(selectedSourceId.value)
-                .enqueue(object : Callback<NewsResponse> {
-                    override fun onResponse(
-                        p0: Call<NewsResponse>,
-                        response: Response<NewsResponse>
-                    ) {
-                        val list = response.body()?.articles
-                        if (list != null) {
-                            newsListStates.clear()
-                            newsListStates.addAll(list)
-                        }
-                    }
+    LaunchedEffect(viewModel.selectedSourceId.value) {
+        viewModel.getNewsBySource()
 
-                    override fun onFailure(p0: Call<NewsResponse>, p1: Throwable) {
-                        TODO("Not yet implemented")
-                    }
-
-                })
     }
     Column(modifier) {
-        if (sourcesListStates.isNotEmpty())
+        if (sourcesList.isNotEmpty())
             SourcesTabRow(
-                sourcesList = sourcesListStates,
+                sourcesList = sourcesList,
                 modifier = Modifier.padding(bottom = 8.dp)
             ) {
-                newsListStates.clear()
-                selectedSourceId.value = it
+                newsList.clear()
+                viewModel.selectedSourceId.value = it
             }
-        NewsList(newsList = newsListStates)
+        NewsList(newsList = newsList)
     }
+    if (viewModel.isLoading.value)
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            CircularProgressIndicator(color = Color.White)
+        }
+    if (viewModel.errorState.value.isNotEmpty())
+        ErrorDialog(viewModel = viewModel)
+}
+
+@Composable
+fun ErrorDialog(viewModel: NewsViewModel, modifier: Modifier = Modifier) {
+    AlertDialog(onDismissRequest = { viewModel.errorState.value = "" }, confirmButton = {
+        TextButton(onClick = { viewModel.errorState.value = "" }) {
+            Text(text = stringResource(R.string.ok))
+        }
+    }, containerColor = Color.White, text = {
+        Text(text = viewModel.errorState.value, color = Color.Black, fontSize = 14.sp)
+    }
+    )
 }
 
 
@@ -212,36 +208,6 @@ fun SourcesTabRow(
             }
         }
     }
-}
-
-fun getSources(
-    endpointId: String,
-    onSuccess: (sources: List<SourcesItem>) -> Unit,
-    onFailure: (message: String) -> Unit
-) {
-    ApiManager.newsServices.getSources(categoryId = endpointId)
-//                        .execute() // Run On Main Thread
-        .enqueue(object : Callback<SourcesResponse> {
-            override fun onFailure(
-                p0: Call<SourcesResponse>,
-                throwable: Throwable
-            ) {
-                Log.e("TAG", "onFailure: ${throwable.message}")
-
-                onFailure(throwable.message ?: "Something Went Wrong")
-            }
-
-            override fun onResponse(
-                call: Call<SourcesResponse>,
-                response: Response<SourcesResponse>
-            ) {
-                Log.e("TAG", "onResponse: ${response}")
-                Log.e("TAG", "onResponse: ${response.body()?.sources}")
-                val list = response.body()?.sources
-                if (list?.isNotEmpty() == true)
-                    onSuccess(list)
-            }
-        }) // Run on Background Thread and Returns Result On Main Thread
 }
 
 @Preview(showSystemUi = true)

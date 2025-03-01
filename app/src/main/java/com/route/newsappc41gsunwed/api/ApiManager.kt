@@ -6,6 +6,10 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
+// TaskListFragment -> TasksViewModel     TaskDatabase.getInstance().getTaskDao().getTaskList()
+// SettingsFragment -> SettingsViewModel
+
+
 object ApiManager {
     val API_KEY = "8e30e66ecc364d75967401f639e6f535"
     private val httpLoggingInterceptor = HttpLoggingInterceptor { message ->
