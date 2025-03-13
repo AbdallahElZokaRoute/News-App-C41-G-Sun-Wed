@@ -16,7 +16,9 @@ import com.route.newsappc41gsunwed.categories.CategoriesScreen
 import com.route.newsappc41gsunwed.news.NewsScreenContent
 import com.route.newsappc41gsunwed.ui.theme.NewsAppC41GSunWedTheme
 import com.route.newsappc41gsunwed.utils.topBar.NewsToolbar
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     // Side Effect ->
     override fun onCreate(savedInstanceState: Bundle?) {

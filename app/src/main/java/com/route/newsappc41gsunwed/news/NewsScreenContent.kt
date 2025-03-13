@@ -18,16 +18,14 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -40,20 +38,25 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.route.newsappc41gsunwed.R
-import com.route.newsappc41gsunwed.api.model.ArticlesItem
-import com.route.newsappc41gsunwed.api.model.SourcesItem
+import com.route.data.api.model.ArticlesItem
+import com.route.data.api.model.SourcesItem
 import com.route.newsappc41gsunwed.ui.theme.gray
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.route.domain.entities.ArticlesItemEntity
+import com.route.domain.entities.SourcesItemEntity
 
 // News Screen -> MVVM
 @Composable
 fun NewsScreenContent(
-    endpointId: String, viewModel: NewsViewModel = viewModel(), modifier: Modifier = Modifier
+    endpointId: String, viewModel: NewsViewModel = hiltViewModel(), modifier: Modifier = Modifier
 ) {
     val sourcesList = viewModel.sourcesListStates
     val newsList = viewModel.newsListStates
+    val coroutineScope = rememberCoroutineScope()
+
     LaunchedEffect(Unit) {
         viewModel.getSources(endpointId)
     }
@@ -98,7 +101,7 @@ fun ErrorDialog(viewModel: NewsViewModel, modifier: Modifier = Modifier) {
 
 
 @Composable
-fun NewsList(newsList: List<ArticlesItem>, modifier: Modifier = Modifier) {
+fun NewsList(newsList: List<ArticlesItemEntity>, modifier: Modifier = Modifier) {
     LazyColumn {
         items(newsList) {
             NewsCard(articleItem = it)
@@ -107,7 +110,7 @@ fun NewsList(newsList: List<ArticlesItem>, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun NewsCard(articleItem: ArticlesItem, modifier: Modifier = Modifier) {
+fun NewsCard(articleItem: ArticlesItemEntity, modifier: Modifier = Modifier) {
     Card(
         modifier
             .fillMaxWidth()
@@ -149,7 +152,7 @@ fun NewsCard(articleItem: ArticlesItem, modifier: Modifier = Modifier) {
 @Composable
 private fun NewsCardPreview() {
     NewsCard(
-        articleItem = ArticlesItem(
+        articleItem = ArticlesItemEntity(
             author = "Jon Haworth",
             title = "40-year-old man falls 200 feet to his death while canyoneering at national park",
 
@@ -159,7 +162,7 @@ private fun NewsCardPreview() {
 
 @Composable
 fun SourcesTabRow(
-    sourcesList: List<SourcesItem>,
+    sourcesList: List<SourcesItemEntity>,
     modifier: Modifier = Modifier,
     onSourceSelected: (id: String) -> Unit
 ) {
@@ -215,9 +218,9 @@ fun SourcesTabRow(
 private fun SourcesTabRowPreview() {
     SourcesTabRow(
         sourcesList = listOf(
-            SourcesItem(name = "ABC News"),
-            SourcesItem(name = "Al-Jazeera"),
-            SourcesItem(name = "BBC News")
+            SourcesItemEntity(name = "ABC News"),
+            SourcesItemEntity(name = "Al-Jazeera"),
+            SourcesItemEntity(name = "BBC News")
         )
     ) {
 

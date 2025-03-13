@@ -1,6 +1,4 @@
-package com.route.newsappc41gsunwed.api.model
-
-import com.route.newsappc41gsunwed.R
+package com.route.newsappc41gsunwed
 
 data class Category(
     val titleResId: Int? = null,
