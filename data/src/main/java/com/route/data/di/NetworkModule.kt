@@ -1,6 +1,7 @@
 package com.route.data.di
 
 import android.util.Log
+import com.route.data.api.ApiKeyInterceptor
 import com.route.data.api.NewsServices
 import dagger.Module
 import dagger.Provides
@@ -15,7 +16,8 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-
+    // Interceptors
+    // MVI UI Architecture Pattern
 
     @Singleton
     @Provides
@@ -33,6 +35,12 @@ object NetworkModule {
 
     @Singleton
     @Provides
+    fun provideAPIKeyInterceptor(): ApiKeyInterceptor {
+        return ApiKeyInterceptor()
+    }
+
+    @Singleton
+    @Provides
     fun provideHttpLoggingInterceptor(): HttpLoggingInterceptor {
         return HttpLoggingInterceptor {
             Log.e("API", it)
@@ -42,9 +50,11 @@ object NetworkModule {
     @Singleton
     @Provides
     fun provideOkhttpClient(
-        httpLoggingInterceptor: HttpLoggingInterceptor
+        httpLoggingInterceptor: HttpLoggingInterceptor,
+        apiKeyInterceptor: ApiKeyInterceptor,
     ): OkHttpClient {
         return OkHttpClient.Builder()
+            .addInterceptor(apiKeyInterceptor)
             .addInterceptor(httpLoggingInterceptor)
             .build()
     }

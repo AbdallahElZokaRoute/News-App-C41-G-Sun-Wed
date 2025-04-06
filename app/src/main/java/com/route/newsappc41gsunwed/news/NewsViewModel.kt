@@ -5,16 +5,8 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.route.data.api.model.ArticlesItem
-import com.route.data.api.model.NewsResponse
-import com.route.data.api.model.SourcesItem
-import com.route.data.api.model.SourcesResponse
-import com.route.data.dataSource.online.NewsOnlineDataSourceImpl
-import com.route.data.repositories.NewsRepositoryImpl
 import com.route.domain.entities.ArticlesItemEntity
 import com.route.domain.entities.SourcesItemEntity
-import com.route.domain.repositories.NewsOnlineDataSource
-import com.route.domain.repositories.NewsRepository
 import com.route.domain.usecases.GetNewsUseCase
 import com.route.domain.usecases.GetSourcesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
